@@ -1,0 +1,34 @@
+---
+- name: Connecting to the server
+  include_tasks: first-connection.yaml
+  tags:
+    - first
+
+- name: Change SSH attributes
+  include_tasks: ssh-setup.yaml
+  tags:
+    - ssh-setup
+
+- name: Change hostname attributes
+  include_tasks: setup-host.yaml
+  tags:
+    - hostname
+
+- name: added skel
+  copy:
+    src: files/bashrc.script
+    dest: /etc/skel/.bashrc
+    owner: root
+    group: root
+    mode: '644'
+  tags:
+     - login
+
+- name: Setup default users
+  include_tasks: init-users.yaml
+
+- name: Setup regular users
+  include_tasks: users.yaml
+  tags:
+    - coreusers
+

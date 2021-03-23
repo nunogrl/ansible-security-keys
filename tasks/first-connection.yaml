@@ -1,0 +1,30 @@
+---
+- name: Check if connection is possible
+  command:
+    ssh \
+      {% if ansible_ssh_pass is defined %} -o User={{ ansible_user }} \ {% endif %}
+      -o ConnectTimeout=10 \
+      -o PreferredAuthentications=publickey \
+      -o PubkeyAuthentication=yes {{ ansible_host }} \
+      echo Worked
+  register: result
+  delegate_to: localhost
+  ignore_errors: yes
+  changed_when: False
+  become: no
+  # no_log: True
+  tags:
+    - first
+
+- name: show output
+  debug:
+    var: result.failed
+  tags:
+    - first
+
+- name: Attempting root credentials
+  connection: local
+  set_fact:
+    ansible_ssh_user: root 
+    ansible_ssh_pass: "{{ root_password }}"
+  when: result.failed
