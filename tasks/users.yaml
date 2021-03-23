@@ -1,0 +1,110 @@
+- name: get core users names
+  set_fact:
+    serverusers: "{{
+      lookup(
+        'filetree',
+        'users/'
+        ) | json_query(listquery)
+      }}"
+  vars:
+    listquery:
+      "[*].path"
+  tags:
+    - coreusers
+
+- name: Add other users
+  user:
+    name: "{{ item }}"
+    shell: /bin/bash
+  with_items: "{{ serverusers }}"
+  when: serverusers is defined
+  tags:
+     - coreusers
+
+- name: Add authorized keys for core users
+  authorized_key:
+    user: "{{ item }}"
+    key: "{{
+      lookup(
+        'file',
+        'users/{{ item }}')
+      }}"
+  with_items: "{{ serverusers }}"
+  when: serverusers is defined
+  tags:
+     - coreusers
+
+- name: Restore skel on all users
+  copy:
+    src: files/bashrc.script
+    dest: "/home/{{ item }}/.bashrc"
+    owner: "{{ item }}"
+    group: "{{ item }}"
+    mode: '644'
+    # with_items: "{{ serverusers }}"
+  with_items: "{{
+    main_users |
+    union(serverusers)
+    }}"
+  when: serverusers is defined
+  tags:
+     - coreusers
+
+- name: Add core users to sudoers.d
+  template:
+    src: files/deploysudoers.j2
+    dest: /etc/sudoers.d/{{ item }}
+    owner: root
+    group: root
+    mode: 0400
+    force: no
+  with_items: "{{
+    main_users |
+    union(serverusers)
+    }}"
+  tags:
+     - coreusers
+  when: serverusers is defined
+
+- name: Find existing users
+  shell: |
+    set -o pipefail
+    cat /etc/passwd | awk -F: '{ if ($3>=1000 && $3<4000) print $1 }'
+  args:
+    executable: /bin/bash
+  register: existingusers
+  changed_when: "'deploy' not in existingusers.stdout"
+  # no_log: True
+  tags:
+     - coreusers
+
+- name: identify users to delete
+  set_fact:
+    removeusers: "{{
+      existingusers.stdout_lines |
+      difference( main_users | union(serverusers))
+      }}"
+  no_log: True
+  tags:
+     - coreusers
+  when: serverusers is defined
+
+- name: delete all users
+  set_fact:
+    removeusers: "{{
+      existingusers.stdout_lines |
+      difference(main_users)
+      }}"
+  no_log: True
+  tags:
+     - coreusers
+  when: serverusers is not defined
+
+- name: Delete unused  users
+  user:
+    name: "{{ item }}"
+    state: absent
+    remove: yes
+  with_items: "{{ removeusers }}"
+  when: removeusers is defined
+  no_log: True
