@@ -1,0 +1,54 @@
+---
+- hosts: all
+  become: yes
+  become_method: sudo
+  gather_facts: False
+  vars:
+    root_password: "{{ lookup(
+        'passwordstore',
+        'jessievbox/users/originalpass'
+        ) }}"
+  tasks:
+    - name: initusers - Change root password
+      user:
+        name: root
+        password: "{{ root_password | password_hash('sha512') }}"
+        # no_log: True
+    - name: Allow password authentication
+      lineinfile:
+        dest: /etc/ssh/sshd_config
+        regexp: "^PasswordAuthentication"
+        line: "PasswordAuthentication yes"
+        state: present
+    - name: Allow root login
+      lineinfile:
+        dest: /etc/ssh/sshd_config
+        regexp: "^PermitRootLogin"
+        line: "PermitRootLogin Yes"
+        state: present
+
+    - name: Restart ssh
+      service:
+        name: ssh
+        state: restarted
+
+- hosts: all
+  become: yes
+  become_method: sudo
+  gather_facts: False
+  vars:
+    main_users:
+      - ansible
+      - vagrant
+    hostname: tests
+    ansible_ssh_host: 192.168.33.11
+    ansible_port: 22
+    SSH_PORT: 22
+    root_password: "{{
+      lookup(
+        'passwordstore',
+        'jessievbox/users/originalpass'
+        )
+      }}"
+  roles:
+    - role: '{{playbook_dir}}'
