@@ -3,6 +3,19 @@ Ansible Security Keys
 
 Performs linux hardening and deploy the user keys as required.
 
+
+Test
+----
+
+run vagrant with:
+
+    vagrant up
+
+and test another user with:
+
+    ansible-playbook -i hosts.txt tests.yml
+
+
 Requirements
 ------------
 
