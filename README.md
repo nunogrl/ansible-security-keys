@@ -16,6 +16,37 @@ and test another user with:
     ansible-playbook -i hosts.txt tests.yml
 
 
+Handling users
+--------------
+
+There are 2 configurations for users, the `main_users` and the `serverusers`.
+
+`main_users` are the ones you want to aknowledge their existence,
+but you don't want to mess with them.
+
+Examples of this are "ec2-user","git", etc
+
+    main_users:
+      - git
+      - ansible
+      - vagrant
+
+`serverusers` are the users and keys you want to maintain: update and delete.
+
+    serverusers:
+      - donald
+      - mickey
+
+This will grab the keys from the files with the same name stored on the "users"
+folder.
+
+Notes:
+
+- if the list is not provided, it creates a list from the all the users list.
+- if there's no matching file for a user, the playbook will fail to execute.
+
+
+
 Requirements
 ------------
 
