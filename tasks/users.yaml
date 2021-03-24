@@ -9,6 +9,7 @@
   vars:
     listquery:
       "[*].path"
+  when: serverusers is not defined
   tags:
     - coreusers
 
@@ -31,6 +32,12 @@
       }}"
   with_items: "{{ serverusers }}"
   when: serverusers is defined
+  tags:
+     - coreusers
+
+- name: show serverusers
+  debug:
+    msg: "{{ serverusers }}"
   tags:
      - coreusers
 
@@ -62,9 +69,9 @@
     main_users |
     union(serverusers)
     }}"
+  when: serverusers is defined
   tags:
      - coreusers
-  when: serverusers is defined
 
 - name: Find existing users
   shell: |
@@ -85,9 +92,9 @@
       difference( main_users | union(serverusers))
       }}"
   no_log: True
+  when: serverusers is defined
   tags:
      - coreusers
-  when: serverusers is defined
 
 - name: delete all users
   set_fact:
@@ -96,9 +103,9 @@
       difference(main_users)
       }}"
   no_log: True
+  when: serverusers is not defined
   tags:
      - coreusers
-  when: serverusers is not defined
 
 - name: Delete unused  users
   user:
@@ -107,4 +114,5 @@
     remove: yes
   with_items: "{{ removeusers }}"
   when: removeusers is defined
-  no_log: True
+  tags:
+     - coreusers
