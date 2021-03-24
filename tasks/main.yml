@@ -26,6 +26,8 @@
 
 - name: Setup default users
   include_tasks: init-users.yaml
+  tags:
+    - defaultusers
 
 - name: Setup regular users
   include_tasks: users.yaml
