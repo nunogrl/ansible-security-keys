@@ -1,0 +1,22 @@
+---
+- name: update hostname
+  hostname:
+    name: "{{ hostname }}"
+  tags:
+    - hostname
+
+- name: update hosts
+  lineinfile:
+    path: /etc/hosts
+    regexp: '^127\.(\S)*\s(?!localhost)'
+    line: "127.0.1.1       {{ hostname }}.tests.com    {{ hostname }}"
+  tags:
+    - hostname
+
+- name: install rsync sudo cron
+  apt:
+    pkg:
+      - rsync
+      - sudo
+      - cron
+      - facter
