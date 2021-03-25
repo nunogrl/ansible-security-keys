@@ -2,7 +2,7 @@
 - name: Check if connection is possible
   command:
     ssh \
-      {% if ansible_ssh_pass is defined %} -o User={{ ansible_user }} \ {% endif %}
+      {% if ansible_user is defined %} -o User={{ ansible_user }} \ {% endif %}
       -o ConnectTimeout=10 \
       -o PreferredAuthentications=publickey \
       -o PubkeyAuthentication=yes {{ ansible_host }} \
