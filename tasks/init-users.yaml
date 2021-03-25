@@ -1,0 +1,10 @@
+---
+- name: Add deploy user
+  user:
+    name: "{{ item }}"
+    shell: /bin/bash
+  with_items: "{{ main_users }}"
+  no_log: True
+  tags:
+     - initialtusers
+
