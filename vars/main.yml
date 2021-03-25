@@ -1,0 +1,5 @@
+---
+# vars file for security-keysansible.key
+#
+
+SSH_PORT: 22
