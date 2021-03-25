@@ -14,15 +14,15 @@
   tags:
     - hostname
 
-- name: added skel
-  copy:
-    src: files/bashrc.script
-    dest: /etc/skel/.bashrc
-    owner: root
-    group: root
-    mode: '644'
-  tags:
-     - login
+      #- name: added skel
+      #  copy:
+      #    src: files/bashrc.script
+      #    dest: /etc/skel/.bashrc
+      #    owner: root
+      #    group: root
+      #    mode: '644'
+      #  tags:
+      #     - login
 
 - name: Setup default users
   include_tasks: init-users.yaml

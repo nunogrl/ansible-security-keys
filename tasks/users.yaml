@@ -41,21 +41,21 @@
   tags:
      - coreusers
 
-- name: Restore skel on all users
-  copy:
-    src: files/bashrc.script
-    dest: "/home/{{ item }}/.bashrc"
-    owner: "{{ item }}"
-    group: "{{ item }}"
-    mode: '644'
-    # with_items: "{{ serverusers }}"
-  with_items: "{{
-    main_users |
-    union(serverusers)
-    }}"
-  when: serverusers is defined
-  tags:
-     - coreusers
+       #- name: Restore skel on all users
+       #  copy:
+       #    src: files/bashrc.script
+       #    dest: "/home/{{ item }}/.bashrc"
+       #    owner: "{{ item }}"
+       #    group: "{{ item }}"
+       #    mode: '644'
+       #    # with_items: "{{ serverusers }}"
+       #  with_items: "{{
+       #    main_users |
+       #    union(serverusers)
+       #    }}"
+       #  when: serverusers is defined
+       #  tags:
+       #     - coreusers
 
 - name: Add core users to sudoers.d
   template:
