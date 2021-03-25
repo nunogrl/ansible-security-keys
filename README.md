@@ -57,18 +57,29 @@ a good idea to mention in this section that the boto package is required.
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including
-any variables that are in defaults/main.yml, vars/main.yml, and any variables
-that can/should be set via parameters to the role. Any variables that are
-read from other roles and/or the global scope (ie. hostvars, group vars,
-etc.) should be mentioned here as well.
+SSH_PORT
+
+    the ssh port. If not provided, it will remain 22
+
+
+root_password
+
+    the password to attempt if the user fails to login
+
+
+main_users
+
+    users to keep regardless the keys are present or absent
+
+
+serverusers
+
+    users to maintain
 
 Dependencies
 ------------
 
-A list of other roles hosted on Galaxy should go here, plus any details in
-regards to parameters that may need to be set for other roles, or variables
-that are used from other roles.
+none
 
 Example Playbook
 ----------------
@@ -77,6 +88,19 @@ Including an example of how to use your role (for instance, with variables
 passed in as parameters) is always nice for users too:
 
     - hosts: servers
+      become: yes
+      become_method: sudo
+      gather_facts: False
+      vars:
+        main_users:
+          - ec2-user
+          - git
+        serverusers:
+          - mickey
+          - goofy
+        hostname: tests
+        SSH_PORT: 22
+        root_password: "PleaseDontPutAnClearTextPasswordHere"
       roles:
          - { role: username.rolename, x: 42 }
 
